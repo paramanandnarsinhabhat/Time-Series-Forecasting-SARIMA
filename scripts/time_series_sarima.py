@@ -93,4 +93,67 @@ plt.legend(loc='best')
 plt.title("Stationary Series")
 plt.show()
 
+train_data['count_log'] = np.log(train_data['count'])
+train_data['count_log_diff'] = train_data['count_log'] - train_data['count_log'].shift(1)
+
+plt.figure(figsize=(12,8))
+
+plt.plot(train_data.index,train_data['count_log_diff'], label='stationary series')
+plt.legend(loc='best')
+plt.title("Stationary Series")
+plt.show()
+
+adf_test(train_data['count_log_diff'].dropna())
+
+kpss_test(train_data['count_log_diff'].dropna())
+
+# ACF and PACF plots
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+
+plot_acf(train_data['count_log_diff'].dropna(), lags=15)
+plot_pacf(train_data['count_log_diff'].dropna(), lags=15)
+plt.show()
+
+'''
+   - p value is the lag value where the PACF chart crosses the confidence interval for the first time. It can be noticed that in this case p=2.
+
+   - q value is the lag value where the ACF chart crosses the confidence interval for the first time. It can be noticed that in this case q=2.
+
+   - Now we will make the ARIMA model as we have the p,q values.
+
+'''
+
+# SARIMA
+from statsmodels.tsa.statespace import sarimax
+
+plot_acf(train_data['count_log_diff'].dropna(), lags=25)
+plot_pacf(train_data['count_log_diff'].dropna(), lags=25)
+plt.show()
+
+train_data['count_log'] = np.log(train_data['count'])
+train_data['count_log_diff'] = train_data['count_log'] - train_data['count_log'].shift(7)
+
+train_data['count_log_diff'].head(10)
+
+plot_acf(train_data['count_log_diff'].dropna(), lags=25)
+plot_pacf(train_data['count_log_diff'].dropna(), lags=25)
+plt.show()
+
+# fit model
+model = sarimax.SARIMAX(train_data['count_log'], seasonal_order=(1,1,1,7), order=(2,1,2))
+fit1 = model.fit()
+
+# make predictions
+valid_data['SARIMA'] = fit1.predict(start="2014-02-09", end="2014-09-25", dynamic=True)
+
+
+valid_data['SARIMA'] = np.exp(valid_data['SARIMA'])
+
+plt.figure(figsize=(12,8))
+
+plt.plot(train_data['count'],  label='train') 
+plt.plot(valid_data['count'],  label='valid') 
+plt.plot(valid_data['SARIMA'],  label='predicted') 
+plt.legend(loc='best') 
+plt.show()
 
