@@ -63,3 +63,34 @@ Here test statistic is > than critical.
 Hence series is not stationary**
 
 '''
+def kpss_test(timeseries):
+    print ('Results of KPSS Test:')
+    kpsstest = kpss(timeseries, regression='c')
+    kpss_output = pd.Series(kpsstest[0:3], index=['Test Statistic','p-value','Lags Used'])
+    for key,value in kpsstest[3].items():
+        kpss_output['Critical Value (%s)'%key] = value
+    print (kpss_output)
+
+
+kpss_test(train_data['count'])
+
+'''
+If the test statistic is greater than the critical value, we reject the null hypothesis (series is not stationary). If the test statistic is less than the critical value, if fail to reject the null hypothesis (series is stationary).  **Here test statistic is > than critical. Hence series is not stationary**
+
+Alternatively, we can use the p-value to make the inference. If p-value is less than 0.05, we can reject the null hypothesis. And say that the series is not stationary.
+
+'''
+
+# Making Series Stationary
+
+train_data['count_diff'] = train_data['count'] - train_data['count'].shift(1)
+
+plt.figure(figsize=(12,8))
+
+plt.plot(train_data.index, train_data['count'], label='train_data')
+plt.plot(train_data.index,train_data['count_diff'], label='stationary series')
+plt.legend(loc='best')
+plt.title("Stationary Series")
+plt.show()
+
+
