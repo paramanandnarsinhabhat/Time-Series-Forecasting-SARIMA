@@ -15,3 +15,6 @@ valid_data = pd.read_csv("/Users/paramanandbhat/Downloads/7.3_ARIMA_and_SARIMA_m
 
 print(train_data.shape)
 print(train_data.head())
+
+print(valid_data.shape)
+print(valid_data.head())
