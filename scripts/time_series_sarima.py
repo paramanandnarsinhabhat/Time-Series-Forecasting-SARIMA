@@ -33,3 +33,33 @@ plt.plot(valid_data.index,valid_data['count'], label='valid')
 plt.legend(loc='best')
 plt.title("Train and Validation Data")
 plt.show()
+
+# Stationarity Test
+# dickey fuller, KPSS
+from statsmodels.tsa.stattools import adfuller, kpss
+
+def adf_test(timeseries):
+    
+    #Perform Dickey-Fuller test:
+    print ('Results of Dickey-Fuller Test:')
+    dftest = adfuller(timeseries, autolag='AIC')
+    dfoutput=pd.Series(dftest[0:4], index=['Test Statistic','p-value','#Lags Used','Number of Observations Used'])
+
+    for key,value in dftest[4].items():
+        dfoutput['Critical Value (%s)'%key] = value
+    print (dfoutput)
+
+adf_test(train_data['count'])
+   
+'''
+If the test statistic is less than the 
+critical value, we can reject the null 
+hypothesis (aka the series is stationary). 
+When the test statistic is greater than the
+ critical value, we fail to reject the null 
+ hypothesis (which means the series is not 
+ stationary). **
+Here test statistic is > than critical. 
+Hence series is not stationary**
+
+'''
